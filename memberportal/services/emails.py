@@ -32,8 +32,6 @@ def send_single_email(
         template_to_use, {"email": template_vars, "config": config}
     )
 
-    print(config.ENABLE_SES_FOR_EMAIL)
-
     if config.ENABLE_SES_FOR_EMAIL:
         client = boto3.client("ses")
 
