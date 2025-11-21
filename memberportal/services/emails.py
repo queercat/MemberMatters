@@ -4,6 +4,7 @@ from constance import config
 from postmarker.core import PostmarkClient, ClientError
 import logging
 import json
+import boto3
 
 logger = logging.getLogger("emails")
 
@@ -31,7 +32,35 @@ def send_single_email(
         template_to_use, {"email": template_vars, "config": config}
     )
 
-    if config.POSTMARK_API_KEY:
+    print(config.ENABLE_SES_FOR_EMAIL)
+
+    if config.ENABLE_SES_FOR_EMAIL:
+        client = boto3.client("ses")
+
+        try:
+            response = client.send_email(
+                Source=config.EMAIL_DEFAULT_FROM,
+                Destination={
+                    "ToAddresses": [to_email]
+                },
+                Message={
+                    "Body": {
+                        "Html": {
+                            "Charset": "UTF-8",
+                            "Data": email_string
+                        }
+                    },
+                    "Subject": {
+                        "Charset": "UTF-8",
+                        "Data": subject
+                    }
+                },
+                ReplyToAddresses=[reply_to or config.EMAIL_DEFAULT_FROM],
+        )
+        except Exception as e:
+            logger.error("Unable to send email " + str(e))
+            raise e
+    elif config.POSTMARK_API_KEY:
         postmark = PostmarkClient(server_token=config.POSTMARK_API_KEY)
         try:
             postmark.emails.send(
@@ -66,7 +95,7 @@ def send_single_email(
                 "Email content: " + json.dumps(template_vars),
             )
     else:
-        logger.warning("No postmark API key set, not sending email")
+        logger.warning("No postmark API key set and SES not configured not sending email")
         if user:
             user.log_event(
                 "Email NOT sent due to configuration issue: " + subject,

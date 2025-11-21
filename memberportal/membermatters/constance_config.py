@@ -327,6 +327,10 @@ CONSTANCE_CONFIG = {
         False,
         "Enable if you want to see the members signed into site on the portal dashboard.",
     ),
+    "ENABLE_SES_FOR_EMAIL": (
+        False,
+        "Enable if you want to use AWS SES for sending emails."
+    ),
     "MAILCHIMP_API_KEY": ("", "Enable Mailchimp sync by specifying an API key."),
     "MAILCHIMP_SERVER": ("", "Required if enabling the Mailchimp integration."),
     "MAILCHIMP_LIST_ID": ("", "Required if enabling the Mailchimp integration."),
@@ -422,6 +426,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "ENABLE_PORTAL_SITE_SIGN_IN",
                 "ENABLE_PORTAL_MEMBERS_ON_SITE",
                 "ENABLE_DOOR_BUMP_API",
+                "ENABLE_SES_FOR_EMAIL"
             ),
         ),
         ("Stats Settings", ("ENABLE_STATS_PAGE", "STATS_MAX_DAYS")),
